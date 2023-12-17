@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
-import { Home } from "./components/Home/Home";
-import { About } from "./components/About/About";
-import { Login } from "./components/Login/Login";
-import { Register } from "./components/Register/Register";
-import { Tasks } from "./components/Tasks/Tasks";
-import { TasksForm } from "./components/Tasks/TasksForm";
-import { Profile } from "./components/Profile/Profile"; 
+import Home from "./components/Home/Home";
+import About from "./components/About/About";
+import Login from "./components/Login/Login";
+import Register from "./components/Register/Register";
+import Tasks from "./components/Tasks/Tasks";
+import TasksForm from "./components/Tasks/TasksForm";
+import Profile from "./components/Profile/Profile"; 
 
 function App() {
   return (
