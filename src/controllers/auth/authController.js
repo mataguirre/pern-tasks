@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import bcrypt from "bcrypt";
-import { createAccessToken } from "../../libs/jwt";
+import { createAccessToken } from "../../libs/jwt.js";
 
 const authController = {
   withDetailsAsync: async () => {
@@ -21,10 +21,10 @@ const authController = {
       },
     });
   },
-  loginAsync: async (data, res) => {
+  loginAsync: async (req, res) => {
     try {
       // Extraigo los datos necesarios
-      const { email, password } = data;
+      const { email, password } = req.body;
 
       // Busco al usuario en la DB
       const user = await prisma.user.findFirst({
@@ -34,7 +34,7 @@ const authController = {
       });
 
       // Si no lo encuentro mando un mensaje de error
-      if (!user) {
+      if (user == null) {
         return res.status(404).json({
           message: "Correo no encontrado",
         });
@@ -61,7 +61,8 @@ const authController = {
       });
 
       // Envío la respuesta con el usuario
-      return user;
+      console.log(req.cookies.token);
+      return res.json(user);
     } catch (error) {
       // Manejo de errores
       console.error("Error en loginAsync:", error);
@@ -74,10 +75,6 @@ const authController = {
     return await prisma.user.create({
       data: { ...data },
     });
-  },
-  logoutAsync: async (req, res) => {
-    res.clearCookie("token");
-    res.sendStatus(200);
   },
 };
 

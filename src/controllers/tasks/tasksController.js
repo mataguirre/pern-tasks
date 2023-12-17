@@ -5,8 +5,11 @@ const tasksController = {
   getListAsync: async () => {
     return await prisma.task.findMany();
   },
-  withDetailsAsync: async () => {
+  withDetailsAsync: async (currentUserId) => {
     return await prisma.task.findMany({
+      where: {
+        userId: currentUserId,
+      },
       include: {
         user: true,
       },
@@ -19,7 +22,8 @@ const tasksController = {
       },
     });
   },
-  createAsync: async (data) => {
+  createAsync: async (data, userId) => {
+    data.userId = userId;
     return await prisma.task.create({
       data: data,
     });

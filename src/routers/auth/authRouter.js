@@ -3,27 +3,36 @@ const router = Router();
 import authController from "../../controllers/auth/authController.js";
 import bcrypt from "bcrypt";
 import { createAccessToken } from "../../libs/jwt.js";
+import { isAuth } from "../../middlewares/auth.js";
+import { logged } from "../../middlewares/logged.js";
+import md5 from "md5";
 
 // Login
-router.post("/login", async (req, res) => {
-  await authController.loginAsync(req.body);
+router.post("/login", logged, async (req, res) => {
+  await authController.loginAsync(req, res);
 });
 
 // Logout
-router.post("/logout", async () => {
-  await authController.logoutAsync();
+router.post("/logout", (req, res) => {
+  res.clearCookie("token");
+  console.log(req.cookies.token);
+  res.json({
+    message: "Has cerrado sesión",
+  });
 });
 
 // Register
-router.post("/register", async (req, res) => {
+router.post("/register", logged, async (req, res) => {
   try {
     const newUser = {
       ...req.body,
     };
 
-    const { password } = newUser;
+    const { password, email } = newUser;
     const hashedPassword = await bcrypt.hash(password, 10);
+    const gravatar = `https://www.gravatar.com/avatar/${md5(email)}`;
     newUser.password = hashedPassword;
+    newUser.gravatar = gravatar;
 
     const registeredUser = await authController.registerAsync(newUser);
 

@@ -19,6 +19,4 @@ export const isAuth = (req, res, next) => {
     req.currentUserId = decoded.id;
     next();
   });
-
-  next();
 };

@@ -4,52 +4,72 @@ import tasksController from "../../controllers/tasks/tasksController.js";
 import { isAuth } from "../../middlewares/auth.js";
 
 // Get list
-router.get("/task", isAuth, async (req, res) => {
-  console.log(req.currentUser);
-  await tasksController
-    .withDetailsAsync()
-    .then((list) => {
-      console.log(list);
-    })
-    .catch((err) => {
-      console.log(err);
+router.get("/tasks", isAuth, async (req, res) => {
+  const currentUserId = req.currentUserId;
+
+  const taskList = await tasksController.withDetailsAsync();
+
+  if (!taskList)
+    return res.send(400).json({
+      message: "No se ha podido obtener la lista de tareas",
     });
+
+  return res.json(taskList);
 });
 
 // Get one
-router.get("/task/:id", isAuth, async (req, res) => {
-  await tasksController.getAsync(parseInt(req.params.id)).then((task) => {
-    if (!task) return;
-    res.json(task);
-  });
+router.get("/tasks/:id", isAuth, async (req, res) => {
+  const task = await tasksController.getAsync(parseInt(req.params.id));
+
+  if (!task)
+    return res.status(404).json({
+      message: "Tarea no encontrada",
+    });
+
+  return res.json(task);
 });
 
 // Create
-router.post("/task", isAuth, async (req, res) => {
-  await tasksController.createAsync(req.body).then((newTask) => {
-    if (!newTask) return;
-    res.json(newTask);
-  });
+router.post("/tasks", isAuth, async (req, res) => {
+  const currentUserId = req.currentUserId;
+
+  const newTask = await tasksController.createAsync(req.body, currentUserId);
+
+  if (!newTask)
+    return res.status(400).json({
+      message: "No se ha podido crear tarea",
+    });
+
+  return res.json(newTask);
 });
 
 // Update
-router.put("/task/:id", isAuth, async (req, res) => {
-  await tasksController
-    .updateAsync(parseInt(req.params.id), req.body)
-    .then((updatedTask) => {
-      if (!updatedTask) return;
-      res.json(updatedTask);
+router.put("/tasks/:id", isAuth, async (req, res) => {
+  const updatedTask = await tasksController.updateAsync(
+    parseInt(req.params.id),
+    req.body
+  );
+
+  if (!updatedTask)
+    return res.status(400).json({
+      message: "No se ha podido actualizar la tarea",
     });
+
+  return res.json(updatedTask);
 });
 
 // Delete
-router.delete("/task/:id", isAuth, async (req, res) => {
-  await tasksController
-    .deleteAsync(parseInt(req.params.id))
-    .then((deletedTask) => {
-      if (!deletedTask) return;
-      res.json(deletedTask);
+router.delete("/tasks/:id", isAuth, async (req, res) => {
+  const deletedTask = await tasksController.deleteAsync(
+    parseInt(req.params.id)
+  );
+
+  if (!deletedTask)
+    return res.status(400).json({
+      message: "No se ha podido eliminar la tarea",
     });
+
+  return res.json(deletedTask);
 });
 
 export default router;
