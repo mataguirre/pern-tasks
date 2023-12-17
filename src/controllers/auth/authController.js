@@ -55,7 +55,8 @@ const authController = {
 
       // Si el token se generó correctamente, creo la cookie
       res.cookie("token", token, {
-        httpOnly: true,
+        // httpOnly: true,
+        secure: true,
         sameSite: "none",
         maxAge: 24 * 60 * 60 * 1000,
       });
