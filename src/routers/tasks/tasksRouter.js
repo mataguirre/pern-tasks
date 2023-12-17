@@ -17,7 +17,7 @@ router.get("/task", isAuth, async (req, res) => {
 });
 
 // Get one
-router.get("/task/:id", async (req, res) => {
+router.get("/task/:id", isAuth, async (req, res) => {
   await tasksController.getAsync(parseInt(req.params.id)).then((task) => {
     if (!task) return;
     res.json(task);
@@ -25,7 +25,7 @@ router.get("/task/:id", async (req, res) => {
 });
 
 // Create
-router.post("/task", async (req, res) => {
+router.post("/task", isAuth, async (req, res) => {
   await tasksController.createAsync(req.body).then((newTask) => {
     if (!newTask) return;
     res.json(newTask);
@@ -33,7 +33,7 @@ router.post("/task", async (req, res) => {
 });
 
 // Update
-router.put("/task/:id", async (req, res) => {
+router.put("/task/:id", isAuth, async (req, res) => {
   await tasksController
     .updateAsync(parseInt(req.params.id), req.body)
     .then((updatedTask) => {
@@ -43,7 +43,7 @@ router.put("/task/:id", async (req, res) => {
 });
 
 // Delete
-router.delete("/task/:id", async (req, res) => {
+router.delete("/task/:id", isAuth, async (req, res) => {
   await tasksController
     .deleteAsync(parseInt(req.params.id))
     .then((deletedTask) => {

@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import bcrypt from "bcrypt";
+import { createAccessToken } from "../../libs/jwt";
 
 const authController = {
   withDetailsAsync: async () => {
@@ -19,30 +21,63 @@ const authController = {
       },
     });
   },
-  loginAsync: async (id, jsontoken) => {
-    return await prisma.user.findFirst({
-      where: {
-        AND: {
-          id,
-          jsontoken,
+  loginAsync: async (data, res) => {
+    try {
+      // Extraigo los datos necesarios
+      const { email, password } = data;
+
+      // Busco al usuario en la DB
+      const user = await prisma.user.findFirst({
+        where: {
+          email,
         },
-      },
-    });
+      });
+
+      // Si no lo encuentro mando un mensaje de error
+      if (!user) {
+        return res.status(404).json({
+          message: "Correo no encontrado",
+        });
+      }
+
+      // Si lo encuentro, verifico la coincidencia de contraseñas
+      const valid = await bcrypt.compare(password, user.password);
+
+      // Si la contraseña no es válida, mando un mensaje de error
+      if (!valid) {
+        return res.status(400).json({
+          message: "La contraseña es incorrecta",
+        });
+      }
+
+      // Si la contraseña es correcta, creo un token para el usuario
+      const token = await createAccessToken({ id: user.id });
+
+      // Si el token se generó correctamente, creo la cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      // Envío la respuesta con el usuario
+      return user;
+    } catch (error) {
+      // Manejo de errores
+      console.error("Error en loginAsync:", error);
+      return res.status(500).json({
+        message: "Error interno del servidor",
+      });
+    }
   },
   registerAsync: async (data) => {
     return await prisma.user.create({
       data: { ...data },
     });
   },
-  logoutAsync: async (id, jsontoken) => {
-    return await prisma.user.findFirst({
-      where: {
-        AND: {
-          id,
-          jsontoken,
-        },
-      },
-    });
+  logoutAsync: async (req, res) => {
+    res.clearCookie("token");
+    res.sendStatus(200);
   },
 };
 
