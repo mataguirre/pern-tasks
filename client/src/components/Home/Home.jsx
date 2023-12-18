@@ -1,7 +1,12 @@
-function RegisterPage() {
+import { useAuth } from "../../context/AuthContext";
+
+function Home() {
+  const data = useAuth();
+  console.log(data);
+
   return (
-    <div>RegisterPage</div>
+    <div>Home</div>
   )
 }
 
-export default RegisterPage
+export default Home

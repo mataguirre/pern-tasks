@@ -1,6 +1,10 @@
 import { Button, Card, Input } from "../UI"
 import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext"
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Label } from "../UI";
 
 function RegisterPage() {
   const {
@@ -9,23 +13,27 @@ function RegisterPage() {
     formState: { errors }
   } = useForm();
 
+  const navigate = useNavigate();
+  
+  const { signup } = useAuth();
+ 
   const requiredErrorMessage = "Este campo es requerido"
 
-  const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
-    const response = await axios.post("http://localhost:3000/api/register", data, {
-      withCredentials: true
-    });
-    console.log(response);
+  const onSubmit = handleSubmit(async(data) => {
+    await signup(data);
+    navigate("/profile");
   })
 
   return (
-    <div className="h-[calc(100vh-64px)] flex items-center justify-center">
+    <div className="h-[100vh] flex items-center justify-center">
       <Card>
-        <h3 className="text-2xl font-bold">Register</h3>
+        <h3 className="text-2xl font-bold text-center">Register</h3>
 
-        <form onSubmit={onSubmit}>
-          <Input type="text" placeholder="Luis" {...register("name",
+        <form onSubmit={onSubmit} className="mt-4">
+          <Label htmlFor="Name">
+            Name
+          </Label>
+          <Input type="text" placeholder="Name" {...register("name",
           {
             required: true
           })}/>
@@ -34,7 +42,10 @@ function RegisterPage() {
             errors.name && <p className="text-red-500">{requiredErrorMessage}</p>
           }
 
-          <Input type="text" placeholder="González" {...register("surname", 
+          <Label htmlFor="Surname">
+            Surname
+          </Label>
+          <Input type="text" placeholder="Surname" {...register("surname", 
           {
             required: true
           })}/>
@@ -43,7 +54,10 @@ function RegisterPage() {
             errors.surname && <p className="text-red-500">{requiredErrorMessage}</p>
           }
 
-          <Input type="email" placeholder="lgonzalez@gmail.com" {...register("email", {
+          <Label htmlFor="Name">
+            Email
+          </Label>
+          <Input type="email" placeholder="Email" {...register("email", {
             required: true
           })}/>
 
@@ -51,6 +65,9 @@ function RegisterPage() {
             errors.email && <p className="text-red-500">{requiredErrorMessage}</p>
           }
 
+          <Label htmlFor="Name">
+            Password
+          </Label>
           <Input type="password" placeholder="**********" 
           {...register("password", {
             required: true
@@ -61,6 +78,11 @@ function RegisterPage() {
           }
 
           <Button>Guardar</Button>
+
+          <div className="flex justify-between gap-1">
+            <p>¿Ya tienes una cuenta?</p>
+            <Link to="/login" className="font-bold">Inicia sesión</Link>
+          </div>
         </form>
       </Card>
     </div>

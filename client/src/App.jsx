@@ -6,6 +6,7 @@ import Register from "./components/Register/Register";
 import Tasks from "./components/Tasks/Tasks";
 import TasksForm from "./components/Tasks/TasksForm";
 import Profile from "./components/Profile/Profile"; 
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/tasks/create" element={<TasksForm />} />
       <Route path="/tasks/1/update" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="*" element={<NotFound/>} />
     </Routes>
   )
 }

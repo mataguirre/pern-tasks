@@ -4,11 +4,10 @@ import authController from "../../controllers/auth/authController.js";
 import bcrypt from "bcrypt";
 import { createAccessToken } from "../../libs/jwt.js";
 import { isAuth } from "../../middlewares/auth.js";
-import { logged } from "../../middlewares/logged.js";
 import md5 from "md5";
 
 // Login
-router.post("/login", logged, async (req, res) => {
+router.post("/login", async (req, res) => {
   await authController.loginAsync(req, res);
 });
 
@@ -22,7 +21,7 @@ router.post("/logout", (req, res) => {
 });
 
 // Register
-router.post("/register", logged, async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const newUser = {
       ...req.body,
