@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List
 
 app = FastAPI()
 
@@ -34,22 +35,24 @@ def getUser(id: int):
         return { "status" : "error", "message" : "User not found" }
 
 # obtener lista de usuarios
-@app.get("/api/users")
+@app.get("/api/users", response_model = List[User], status_code = 201)
 async def getListAsync():
     return getUserList()
 
 # obtener id por path
-@app.get("/api/user/{id}")
+@app.get("/api/user/{id}", response_model = User, status_code = 201)
 async def getUserAsync(id: int):
     return getUser(id)
     
 # obtener id por query params
-@app.get("/api/user")
+@app.get("/api/user", response_model = User, status_code = 201)
 async def getUserAsync(id: int):
    return getUser(id)
 
 # create user
-@app.post("/api/user", status_code=201)
+# se agregó un status_code y
+# un modelo en caso de respuesta correcta
+@app.post("/api/user", response_model = User, status_code = 201)
 async def createUserAsync(user: User):
     if(type(getUser(user.id)) == User):
         raise HTTPException(status_code = 409, detail = "Este usuario ya existe" )
@@ -58,7 +61,7 @@ async def createUserAsync(user: User):
     return user
     
 # update user
-@app.put("/api/user")
+@app.put("/api/user", response_model = User, status_code = 201)
 async def updateUserAsync(user: User):
     
     found = False
@@ -77,7 +80,7 @@ async def updateUserAsync(user: User):
     return user
 
 # delete user
-@app.delete("/api/user")
+@app.delete("/api/user", response_model = List[User], status_code = 201)
 async def deleteAsync(id: int):
     found = False
 
